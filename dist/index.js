@@ -212,6 +212,34 @@ class OBSUtility extends OBSWebSocket {
                 callback();
             }
         });
+
+
+        
+        nodecg.listenFor(`${namespace}:sendMessage`, (_data, callback) => {
+            try {
+                if(_data.data){
+                    return this.send(_data.messageName,_data.data).then( ret =>
+                        {
+                            callback(ret)
+                        });
+                }else{
+                   return this.send(_data.messageName).then( ret =>
+                        {
+                            callback(ret)
+                        });
+                }
+
+            }
+            catch (error) {
+                log.error('Error stopping the streaming:', error);
+                if (callback && !callback.handled) {
+                    callback(error);
+                }
+                return;
+            }
+        });
+
+
         this.on('error', (error) => {
             log.error(error);
             this._reconnectToOBS();
